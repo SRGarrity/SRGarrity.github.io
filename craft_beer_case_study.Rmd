@@ -1,0 +1,9 @@
+---
+title: "Beers Case Study Findings"
+author: "Steven Garrity"
+date: "11/12/2019"
+output: html_document
+---
+
+ABV and IBU histograms: https://garrity.shinyapps.io/beers_case_study/
+

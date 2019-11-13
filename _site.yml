@@ -4,5 +4,7 @@ navbar:
   left:
     - text: "Home"
       href: index.html
-    - text: "CLT"
+    - text: "CLT Practice"
       href: CLT_2.html
+    - text: "Craft Beer Case Study"
+      href: craft_beer_case_study.html
