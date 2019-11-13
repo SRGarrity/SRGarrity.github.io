@@ -8,3 +8,4 @@ output: html_document
 # My first Github website
 ## Note the 6 lines of code above are the yaml tags.
 ### We will knit this rmd to a html file then push index.html to github.io repo
+This is another line of code.
