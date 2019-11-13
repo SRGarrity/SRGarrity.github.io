@@ -1,9 +1,9 @@
 ---
-title: "Web_Git"
+title: "Github Website"
 author: "Steven Garrity"
-date: "11/12/2019"
+last update: "11/12/2019"
 output: html_document
 ---
 
 # Welcome to my Github Website
-## This is a sandbox for learning to deploy, share, and communicate code, data, models, and results.
+This is a sandbox for learning to deploy, share, and communicate code, data, models, and results.
