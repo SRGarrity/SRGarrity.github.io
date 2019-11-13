@@ -52,7 +52,7 @@ hist(xbar_holder1, col = "blue", main = paste("Distribution of the sample mean: 
 hist(xbar_holder2, col = "red", main = paste("Distribution of the sample mean: n = ", n2), xlab = "Dist 2 Sample Means", xlim = c(-4,4))
 ```
 
-## Summary Statistics 
+## Summary Statistics:
 ```{r}
 summary(xbar_holder1) #5 number summary and the mean
 summary(xbar_holder2) #5 number summary and the mean

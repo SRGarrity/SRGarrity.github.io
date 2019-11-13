@@ -5,7 +5,5 @@ date: "11/12/2019"
 output: html_document
 ---
 
-# My first Github website
-## Note the 6 lines of code above are the yaml tags.
-### We will knit this rmd to a html file then push index.html to github.io repo
-This is another line of code.
+# Welcome to my Github Website
+## This is a sandbox for learning to deploy, share, and communicate code, data, models, and results.
