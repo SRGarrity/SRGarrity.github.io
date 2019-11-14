@@ -6,5 +6,7 @@ navbar:
       href: index.html
     - text: "CLT Practice"
       href: CLT_2.html
-    - text: "Craft Beer Case Study"
+    - text: "Craft Beer Rmarkdown"
+      href: Craft_Beer_Rmarkdown.html
+    - text: "Craft Beer Rshiny Apps"
       href: craft_beer_case_study.html
