@@ -10,3 +10,5 @@ navbar:
       href: Craft_Beer_Rmarkdown.html
     - text: "Craft Beer Rshiny Apps"
       href: craft_beer_case_study.html
+    - text: "R Shiny Apps"
+      href: r_shiny_apps.html
