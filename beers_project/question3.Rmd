@@ -1,0 +1,126 @@
+---
+title: "question3"
+author: "Steven Garrity"
+date: "10/9/2019"
+output: html_document
+---
+
+# Question 3: Address the missing values in each column.
+```{r question3, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(rpart)
+library(rpart.plot)
+```
+
+# Data Exploration:
+Determine Which Variables Have Missing Values and How Many
+```{r}
+n_cols = dim(merged)[2]
+for (i in 1:n_cols)
+{
+  print(c(colnames(merged[i]), sum(is.na(merged[i]))))
+}
+# It appears that ABV and IBU are the only columns with missing values.
+
+# Extract the row indices of the missing values
+missingIBUindex <- which(is.na(merged$IBU))
+missingABVindex <- which(is.na(merged$ABV))
+allNAindex <- c(missingIBUindex,missingABVindex)
+length(missingIBUindex)
+length(unique(allNAindex)) 
+```
+
+# Fill ABV missing values:
+For filled each missing ABV value with the median ABV value for that Beer Style. For example, if the missing ABV was for an IPA, then we filled the value with the median ABV value for IPAs.                
+Filled ABV values are placed in the merged data frame as merged$ABVfill.
+```{r}
+merged %>% ggplot(aes(x=Style, y=ABV)) +
+  geom_boxplot(fill ="#13294b", alpha=0.3) +
+  theme(axis.text.x = element_text(angle = 90, hjust=1)) +
+  labs(title="Boxplots of ABV by Beer Style", x="", y="ABV")
+
+# Find the style of each beer with a missing value, calculate the median ABV for that style of beer, and fill the missing value with the median for that style. Filled IBU values are placed into the "merged" dataset as merged$IBUfill.
+merged$ABVfill <- merged$ABV
+for (i in 1:length(missingABVindex))
+{
+  merged$ABVfill[missingABVindex[i]] <- median(merged$ABV[merged$Style == merged$Style[missingABVindex[i]]],na.rm = TRUE)
+}
+
+# sanity check to make sure that we filled all of the missing values:
+which(is.na(merged$ABV))
+which(is.na(merged$ABVfill)) # looks like all values were filled...we are good to proceed
+```
+
+# Fill IBU missing values: 
+We used a regression tree with ABV and Beer Style as predictors to fill missing IBU values.
+Filled IBU values are placed in the merged data frame as merged$IBUfill.
+```{r}
+# Let's try a regression tree (CART)...throw the kitchen sink at it...:)
+# If I get some time, I'd like to tree a bagging algorithm: http://uc-r.github.io/regression_trees
+library(rpart)
+library(rpart.plot)
+# ?rpart
+
+# Get data into the right format:
+forTraining_IBU_rtree <- merged[-missingIBUindex,] %>% 
+  select(ABV,Style,Brewery_name,City,State,Ounces,IBU)
+
+forFilling_IBU_rtree <- merged[missingIBUindex,] %>% 
+  select(ABV,Style,Brewery_name,City,State,Ounces,IBU)
+
+# set up train/test split
+set.seed(8)
+splitPerc = .75
+trainIndices = sample(1:dim(forTraining_IBU_rtree)[1],round(splitPerc * dim(forTraining_IBU_rtree)[1]))
+train = forTraining_IBU_rtree[trainIndices,]
+test = forTraining_IBU_rtree[-trainIndices,]
+
+# train the model
+rtree <- rpart(IBU ~ ABV+Style, 
+               data = train,
+               method = "anova",
+               control = list(cp = 0.0001, xval = 1000))
+
+plotcp(rtree) # visualize relative error by tree size
+# prp(rtree) # visualize the tree structure
+
+######
+# evaluate model performance
+rtree.pred = predict(rtree, test)
+rtree.sse = sum((rtree.pred - test$IBU)^2)
+rtree.mse = mean((rtree.pred - test$IBU)^2)
+rtree.rmse = sqrt(mean((rtree.pred - test$IBU)^2))
+rtree.sse
+rtree.mse
+rtree.rmse
+
+test$predictions <- rtree.pred
+
+test %>% ggplot(aes(x=IBU, y=predictions)) +
+  geom_point(col="#13294b") +
+  geom_text(x=25, y=110, label="RMSE = 13.1") +
+  geom_text(x=20, y = 100, label='R2 = 0.75') +
+  geom_smooth(method='lm', col="#c8102e") +
+  labs(title='Regression Tree Model Performance', x="Actual IBU", y="Predicted IBU")
+######
+
+# now that model performance is complete, fit a new model using all available data. This model will be used to fill IBU values.
+rtree <- rpart(IBU ~ ABV+Style, 
+               data = forTraining_IBU_rtree,
+               method = "anova",
+               control = list(cp = 0.0001, xval = 1000))
+
+### sanity check before updating the "merged" data frame
+# merged$IBU[missingIBUindex[1]]
+# merged$IBU[missingIBUindex[2]]
+# predict(rtree, forFilling_IBU_rtree[1,])
+# predict(rtree, forFilling_IBU_rtree[2,])
+
+merged$IBUfill <- merged$IBU
+merged$IBUfill[missingIBUindex] <- predict(rtree, forFilling_IBU_rtree)
+
+### complete the sanity check:
+# merged$IBU[missingIBUindex[1]]
+# merged$IBU[missingIBUindex[2]]
+```
+

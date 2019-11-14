@@ -1,0 +1,83 @@
+---
+title: "FinalReport"
+author: "Steven Garrity and Richard Palmer"
+date: "26 October 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r child = './beers_project/dataload.Rmd'}
+```
+
+# Prepared for
+
+Prepared for CEO and CFO of Budweiser, a subsidiary of Anheuser-Busch.  
+
+Case Study 1 project for DS6306 Section 408  Fall 2019  Dr. Bivin Sadler
+
+# Introduction
+
+The purpose of this project is to study a dataset of 
+`r nrow(beers_raw)` beers produced by `r nrow(breweries_raw)`
+breweries in the United States.  We have data on the style, ABV (alcohol by volume)
+and IBU (international bitterness units) of each beer, and we have the city
+and state for each brewery.  The goal is to answer some specific questions 
+about the data and to look for relationships or inferences which may be of
+interest to a hypothetical sponsor, Budweiser.
+
+```{r child = './beers_project/question1.Rmd'}
+```
+
+```{r child = './beers_project/question2.Rmd'}
+```
+
+```{r child = './beers_project/question3.Rmd'}
+```
+
+```{r child = './beers_project/question4.Rmd'}
+```
+
+```{r child = './beers_project/question5.Rmd'}
+```
+
+```{r child = './beers_project/question6.Rmd'}
+```
+
+```{r child = './beers_project/question7.Rmd'}
+```
+
+```{r child = './beers_project/question8.Rmd'}
+```
+
+```{r child = './beers_project/question9.Rmd'}
+```
+
+# Conclusion
+
+It is clear that the craft beer segment of the industry has taken hold across the country.
+There are moderate but clear differences between states in the characteristics of beers.
+
+Examining available measurements of craft beers, we have found statistically significant
+differences in ABV and IBU between different classes of ales.
+
+Looking at the number of breweries in each state, along with population, we have found
+eleven states that represent a potentially underserved market.  Considering the beers 
+that are currently marketed in those states, we have identified four distinct groups of
+states with similar tastes.  Based on the characteristics of beers that are popular in 
+those states, we believe three new labels with appropriate styles could do well in the
+underserved market.  Here is our recommendation:
+
+```{r}
+library(knitr)
+library(kableExtra)
+market <- c('GA,FL,NY','MO,TX,MD,IL,TN,OH,CA','NJ')
+style <- c('IPA','Higher Alcohol Ale','Lower Alcohol Ale')
+recommendation <- data.frame(market,style)
+colnames(recommendation) <- c('Target Marget','Suggested Beer Style')
+kable(recommendation,caption='Stratety for Underserved Market') %>%
+    kable_styling(bootstrap_options=c('striped'))
+```
+

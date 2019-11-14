@@ -1,6 +1,4 @@
 ---
-title: "Github Website"
-author: "Steven Garrity"
 last update: "11/12/2019"
 output: html_document
 ---
