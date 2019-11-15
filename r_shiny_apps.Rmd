@@ -6,5 +6,5 @@ output: html_document
 ---
 
 Old Faithful: https://garrity.shinyapps.io/old_faithful/  
-Annual Forest CO2 Flux Decomposition:  https://garrity.shinyapps.io/decompose_flux/
+Annual Forest CO2 Flux Decomposition:  https://garrity.shinyapps.io/decompose_flux2/
 
