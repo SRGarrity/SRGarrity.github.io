@@ -8,7 +8,7 @@ navbar:
       href: CLT_2.html
     - text: "Craft Beer Rmarkdown"
       href: Craft_Beer_Rmarkdown.html
-    - text: "Craft Beer Rshiny Apps"
+    - text: "Craft Beer R Shiny Apps"
       href: craft_beer_case_study.html
     - text: "R Shiny Apps"
       href: r_shiny_apps.html
