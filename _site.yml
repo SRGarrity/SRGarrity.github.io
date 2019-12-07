@@ -9,6 +9,6 @@ navbar:
     - text: "R Shiny Apps"
       href: r_shiny_apps.html
     - text: "Predict Attrition"
-      href: PredictAttrition.Rmd
+      href: PredictAttrition.html
     - text: "Predict Salary"
-      href: PredictSalary.Rmd
+      href: PredictSalary.html
