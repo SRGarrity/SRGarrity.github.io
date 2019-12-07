@@ -311,20 +311,73 @@ $(document).ready(function () {
 <h1>Executive Summary:</h1>
 <p>Using the data provided, I train and evaluate several models for classifying employee attrition. The models can be used to identify at-risk employees for HR and managers. The one requirement is that the model has a sensitivity and specificity &gt; 0.60. The final step is to use the “best” model to predict attrition with unlabeled data.</p>
 </div>
+<div id="top-three-features-for-predicting-attrition" class="section level1">
+<h1>Top three features for predicting attrition:</h1>
+<p>The top three features for predicting attrition, according to LVQ and Boosted Classification Tree are: 1) Average Number of Years Per Company 2) OverTime 3) MonthlyIncome</p>
+</div>
 <div id="load-packages" class="section level1">
 <h1>Load packages</h1>
-<pre class="r"><code>library(tidyverse)
-library(ggplot2)
-library(GGally)
-library(mlbench)
-library(caret)
-library(corrplot)
-library(randomForest)
-library(knncat)
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ──────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.2.1     ✔ purrr   0.3.2
+## ✔ tibble  2.1.3     ✔ dplyr   0.8.3
+## ✔ tidyr   1.0.0     ✔ stringr 1.4.0
+## ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
+<pre><code>## ── Conflicts ─────────────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(ggplot2)
+library(GGally)</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;GGally&#39;:
+##   method from   
+##   +.gg   ggplot2</code></pre>
+<pre><code>## 
+## Attaching package: &#39;GGally&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     nasa</code></pre>
+<pre class="r"><code>library(mlbench)
+library(caret)</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## 
+## Attaching package: &#39;caret&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     lift</code></pre>
+<pre class="r"><code>library(corrplot)</code></pre>
+<pre><code>## corrplot 0.84 loaded</code></pre>
+<pre class="r"><code>library(randomForest)</code></pre>
+<pre><code>## randomForest 4.6-14</code></pre>
+<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre><code>## 
+## Attaching package: &#39;randomForest&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     combine</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     margin</code></pre>
+<pre class="r"><code>library(knncat)
 library(e1071)
 library(fastDummies)
-library(doSNOW)
-library(parallel)</code></pre>
+library(doSNOW)</code></pre>
+<pre><code>## Loading required package: foreach</code></pre>
+<pre><code>## 
+## Attaching package: &#39;foreach&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:purrr&#39;:
+## 
+##     accumulate, when</code></pre>
+<pre><code>## Loading required package: iterators</code></pre>
+<pre><code>## Loading required package: snow</code></pre>
+<pre class="r"><code>library(parallel)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;parallel&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:snow&#39;:
+## 
+##     clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+##     clusterExport, clusterMap, clusterSplit, makeCluster,
+##     parApply, parCapply, parLapply, parRapply, parSapply,
+##     splitIndices, stopCluster</code></pre>
 </div>
 <div id="set-up-system-for-using-parallel-processing-during-model-training" class="section level1">
 <h1>Set up system for using parallel processing during model training</h1>

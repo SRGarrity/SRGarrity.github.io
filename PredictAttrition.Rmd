@@ -10,6 +10,12 @@ editor_options:
 # Executive Summary:
 Using the data provided, I train and evaluate several models for classifying employee attrition. The models can be used to identify at-risk employees for HR and managers. The one requirement is that the model has a sensitivity and specificity > 0.60. The final step is to use the "best" model to predict attrition with unlabeled data.
 
+# Top three features for predicting attrition:
+The top three features for predicting attrition, according to LVQ and Boosted Classification Tree are:
+1) Average Number of Years Per Company
+2) OverTime
+3) MonthlyIncome
+
 # Load packages
 ```{r}
 library(tidyverse)
