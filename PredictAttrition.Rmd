@@ -8,9 +8,7 @@ editor_options:
 ---
 
 # Executive Summary:
-
-# Introduction to the Problem
-The objective of this project is to create a classification model that is capable of predicting attrition (Yes/No). The one requirement is that the model has a sensitivity and specificity > 0.60.
+Using the data provided, I train and evaluate several models for classifying employee attrition. The models can be used to identify at-risk employees for HR and managers. The one requirement is that the model has a sensitivity and specificity > 0.60. The final step is to use the "best" model to predict attrition with unlabeled data.
 
 # Load packages
 ```{r}

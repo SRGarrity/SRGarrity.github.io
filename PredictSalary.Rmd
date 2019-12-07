@@ -6,7 +6,8 @@ output: html_document
 editor_options: 
   chunk_output_type: inline
 ---
-# This is code for building a multiple linear regression model for predicting employee monthly salary.
+# Objective:
+### Build a multiple linear regression model for predicting employee monthly salary.
 
 # Load Packages:
 ```{r}
