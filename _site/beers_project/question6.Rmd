@@ -1,0 +1,67 @@
+---
+title: "question6"
+output: html_document
+---
+
+```{r question6, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Question 6
+Comment on the summary statistics and distribution of the ABV variable.
+```{r}
+summary(merged$ABVfill)
+sd(merged$ABVfill)
+summary(merged$ABV)
+sd(merged$ABV,na.rm=TRUE)
+
+```
+
+The mean is slightly higher than the median, which would indicate a right skewed distribution,
+one with a long tail of high values.
+
+```{r}
+merged %>%
+  ggplot(aes(x=ABVfill)) + geom_histogram(aes(y=..density..),bins=27) + 
+  ggtitle('Histogram of ABV values (missing values infilled)') +
+  geom_vline(aes(xintercept=median(ABVfill)),color='blue',linetype='dashed',size=1) +
+  geom_text(mapping=aes(x=median(ABVfill),y=40,label="median"),color="blue",angle=90,vjust=-0.4,show.legend=FALSE) +
+  geom_vline(aes(xintercept=mean(ABVfill)), color='red',linetype='dotted',size=1) +
+  geom_text(mapping=aes(x=mean(ABVfill),y=40,label="mean"),color="red",angle=90,vjust=-0.4,show.legend=FALSE) +
+  geom_density(alpha=.2,fill="#FF6666")
+```
+
+The histogram bears this out, as does a box plot
+
+```{r}
+merged %>%
+  ggplot(aes(x="",y=ABVfill)) +
+  geom_boxplot() +
+  xlab("") + ylab("") +
+  ggtitle('ABV values') +
+  #geom_hline(yintercept=0.07,color="blue",show.legend=FALSE) +
+  #geom_text(mapping=aes(y=0.07,label="mean"),color="blue",vjust=-1,show.legend = FALSE) +
+  theme(aspect.ratio = 2.0) +
+  coord_cartesian(ylim=c(0,0.15))
+```
+
+To investigate whether the ABV values are normally distributed, we do
+a Q-Q plot.  This is a plot of the quantiles of the actual data against
+what would be expected from a normal distribution.  If the data do
+follow a normal distribution, the plot would show a straight line.  The
+more the plot deviates from a straight line, the less closely 
+the data follow a normal distribution.
+
+```{r}
+merged %>% 
+  ggplot(aes(sample=ABVfill)) +
+  stat_qq() + stat_qq_line() + 
+  ggtitle('Quantile-Quantile plot of (infilled) ABV data')
+```
+
+From the upward curve in this plot, we infer that the data are somewhat skewed.
+This confirms what the histogram shows.  The apparent discontinuities at the
+ends of the curve are an indication that the ABV values have a few more extreme
+values than would be expected from a normal distribution.  This confirms what
+was shown in the box plot.

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Steven Garrity" />
+
+
+<title>PredictSalary</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="craft_beer_case_study.html">Craft Beer R Shiny Apps</a>
+</li>
+<li>
+  <a href="r_shiny_apps.html">R Shiny Apps</a>
+</li>
+<li>
+  <a href="PredictAttrition.Rmd">Predict Attrition</a>
+</li>
+<li>
+  <a href="PredictSalary.Rmd">Predict Salary</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">PredictSalary</h1>
+<h4 class="author">Steven Garrity</h4>
+<h4 class="date">12/5/2019</h4>
+
+</div>
+
+
+<div id="this-is-code-for-building-a-multiple-linear-regression-model-for-predicting-employee-monthly-salary." class="section level1">
+<h1>This is code for building a multiple linear regression model for predicting employee monthly salary.</h1>
+</div>
+<div id="load-packages" class="section level1">
+<h1>Load Packages:</h1>
+<pre class="r"><code>library(tidyverse)
+library(ggplot2)
+library(GGally)
+library(fastDummies)
+library(doSNOW)
+library(parallel)
+library(lmvar)
+library(olsrr)
+# library(RcmdrPlugin.survival)
+library(MASS)</code></pre>
+</div>
+<div id="set-up-system-for-using-parallel-processing-during-model-training" class="section level1">
+<h1>Set up system for using parallel processing during model training</h1>
+<pre class="r"><code>numberofcores = detectCores() # number of cores available on machine
+cl &lt;- makeCluster(numberofcores, type = &quot;SOCK&quot;)
+# Register cluster so that caret will know to train in parallel.
+registerDoSNOW(cl)</code></pre>
+</div>
+<div id="import-data" class="section level1">
+<h1>Import Data</h1>
+<pre class="r"><code>df &lt;- read.csv(&#39;CaseStudy2-data.csv&#39;, header=TRUE)
+str(df)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    870 obs. of  36 variables:
+##  $ ID                      : int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ Age                     : int  32 40 35 32 24 27 41 37 34 34 ...
+##  $ Attrition               : Factor w/ 2 levels &quot;No&quot;,&quot;Yes&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ BusinessTravel          : Factor w/ 3 levels &quot;Non-Travel&quot;,&quot;Travel_Frequently&quot;,..: 3 3 2 3 2 2 3 3 3 2 ...
+##  $ DailyRate               : int  117 1308 200 801 567 294 1283 309 1333 653 ...
+##  $ Department              : Factor w/ 3 levels &quot;Human Resources&quot;,..: 3 2 2 3 2 2 2 3 3 2 ...
+##  $ DistanceFromHome        : int  13 14 18 1 2 10 5 10 10 10 ...
+##  $ Education               : int  4 3 2 4 1 2 5 4 4 4 ...
+##  $ EducationField          : Factor w/ 6 levels &quot;Human Resources&quot;,..: 2 4 2 3 6 2 4 2 2 6 ...
+##  $ EmployeeCount           : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ EmployeeNumber          : int  859 1128 1412 2016 1646 733 1448 1105 1055 1597 ...
+##  $ EnvironmentSatisfaction : int  2 3 3 3 1 4 2 4 3 4 ...
+##  $ Gender                  : Factor w/ 2 levels &quot;Female&quot;,&quot;Male&quot;: 2 2 2 1 1 2 2 1 1 2 ...
+##  $ HourlyRate              : int  73 44 60 48 32 32 90 88 87 92 ...
+##  $ JobInvolvement          : int  3 2 3 3 3 3 4 2 3 2 ...
+##  $ JobLevel                : int  2 5 3 3 1 3 1 2 1 2 ...
+##  $ JobRole                 : Factor w/ 9 levels &quot;Healthcare Representative&quot;,..: 8 6 5 8 7 5 7 8 9 1 ...
+##  $ JobSatisfaction         : int  4 3 4 4 4 1 3 4 3 3 ...
+##  $ MaritalStatus           : Factor w/ 3 levels &quot;Divorced&quot;,&quot;Married&quot;,..: 1 3 3 2 3 1 2 1 2 2 ...
+##  $ MonthlyIncome           : int  4403 19626 9362 10422 3760 8793 2127 6694 2220 5063 ...
+##  $ MonthlyRate             : int  9250 17544 19944 24032 17218 4809 5561 24223 18410 15332 ...
+##  $ NumCompaniesWorked      : int  2 1 2 1 1 1 2 2 1 1 ...
+##  $ Over18                  : Factor w/ 1 level &quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ OverTime                : Factor w/ 2 levels &quot;No&quot;,&quot;Yes&quot;: 1 1 1 1 2 1 2 2 2 1 ...
+##  $ PercentSalaryHike       : int  11 14 11 19 13 21 12 14 19 14 ...
+##  $ PerformanceRating       : int  3 3 3 3 3 4 3 3 3 3 ...
+##  $ RelationshipSatisfaction: int  3 1 3 3 3 3 1 3 4 2 ...
+##  $ StandardHours           : int  80 80 80 80 80 80 80 80 80 80 ...
+##  $ StockOptionLevel        : int  1 0 0 2 0 2 0 3 1 1 ...
+##  $ TotalWorkingYears       : int  8 21 10 14 6 9 7 8 1 8 ...
+##  $ TrainingTimesLastYear   : int  3 2 2 3 2 4 5 5 2 3 ...
+##  $ WorkLifeBalance         : int  2 4 3 3 3 2 2 3 3 2 ...
+##  $ YearsAtCompany          : int  5 20 2 14 6 9 4 1 1 8 ...
+##  $ YearsInCurrentRole      : int  2 7 2 10 3 7 2 0 1 2 ...
+##  $ YearsSinceLastPromotion : int  0 4 2 5 1 1 0 0 0 7 ...
+##  $ YearsWithCurrManager    : int  3 9 2 7 3 7 3 0 0 7 ...</code></pre>
+<pre class="r"><code># df &lt;- df %&gt;% select(-c(StandardHours,Over18,EmployeeCount,EmployeeNumber,ID,
+#                        PerformanceRating,Department,Attrition,MaritalStatus))
+
+drop &lt;- c(&quot;StandardHours&quot;,&quot;Over18&quot;,&quot;EmployeeCount&quot;,&quot;EmployeeNumber&quot;,&quot;ID&quot;)
+df &lt;- df[,!(names(df) %in% drop)]</code></pre>
+</div>
+<div id="feature-engineering" class="section level1">
+<h1>Feature Engineering</h1>
+<pre class="r"><code># Proportion of Total Career Spent at Current Company
+df$TotalWorkingYears[df$TotalWorkingYears==0]=0.00001
+df$YearsAtCompany[df$YearsAtCompany==0]=0.00001
+df &lt;- df %&gt;% mutate(PropYearsCompany = YearsAtCompany/TotalWorkingYears)
+
+# Average Number of Years Per Company
+df$NumCompaniesWorked[df$NumCompaniesWorked==0]=0.00001
+df &lt;- df %&gt;% mutate(AvgYearsPerCompany = TotalWorkingYears/NumCompaniesWorked)
+
+# Average Years Per Company - Years At Company
+df &lt;- df %&gt;% mutate(YrPerCompMinusYrAtCompany = AvgYearsPerCompany - YearsAtCompany)</code></pre>
+</div>
+<div id="prepare-data-for-multiple-linear-regression" class="section level1">
+<h1>Prepare data for multiple linear regression</h1>
+<pre class="r"><code># create dummy variables for categorical features
+reg_df &lt;- dummy_cols(df, select_columns = c(&quot;EducationField&quot;, &quot;Gender&quot;,&quot;JobRole&quot;,
+                                            &quot;OverTime&quot;,&quot;BusinessTravel&quot;), 
+                     remove_selected_columns = TRUE)</code></pre>
+</div>
+<div id="fit-models-using-backwardforwardstepwise-selection" class="section level1">
+<h1>Fit models using backward/forward/stepwise selection</h1>
+<pre class="r"><code># scaled_df &lt;- reg_df %&gt;% select(-MonthlyIncome) %&gt;% mutate_each(funs(scale(.) %&gt;% as.vector))
+# scaled_df$Income &lt;- reg_df$MonthlyIncome
+# 
+# fullmod &lt;- lm(Income ~ ., data=scaled_df, x=TRUE, y=TRUE)
+# summary(fullmod)
+# RSS_fullmod &lt;- c(crossprod(fullmod$residuals))
+# MSE_fullmod &lt;- RSS_fullmod / length(fullmod$residuals)
+# RMSE_fullmod &lt;- sqrt(MSE_fullmod)
+# plot(scaled_df$Income,fullmod$fitted.values)
+# 
+# backmod &lt;- step(fullmod, trace = 0, x=TRUE, y=TRUE)
+# formula(backmod)
+# summary(backmod)
+# RSS_backmod &lt;- c(crossprod(backmod$residuals))
+# MSE_backmod &lt;- RSS_backmod / length(backmod$residuals)
+# RMSE_backmod &lt;- sqrt(MSE_backmod)
+# plot(scaled_df$Income,backmod$fitted.values)
+# 
+# nullmod &lt;- lm(Income ~ 1,data=scaled_df)
+# 
+# formod = step(nullmod, scope=list(lower=formula(nullmod),
+#                          upper=formula(fullmod)), direction=&quot;forward&quot;)
+# formula(formod)
+# summary(formod)
+# RSS_formod &lt;- c(crossprod(formod$residuals))
+# MSE_formod &lt;- RSS_backmod / length(formod$residuals)
+# RMSE_formod &lt;- sqrt(MSE_formod)
+# plot(scaled_df$Income,formod$fitted.values)
+# 
+# stepmod = step(nullmod, list(lower=formula(nullmod),upper=formula(fullmod)),
+#                direction=&quot;both&quot;,trace=0)
+# formula(stepmod)
+# summary(stepmod)
+# RSS_stepmod &lt;- c(crossprod(stepmod$residuals))
+# MSE_stepmod &lt;- RSS_backmod / length(stepmod$residuals)
+# RMSE_stepmod &lt;- sqrt(MSE_formod)
+# plot(scaled_df$Income,stepmod$fitted.values)</code></pre>
+</div>
+<div id="repeated-cv-to-select-final-model" class="section level1">
+<h1>Repeated CV to select final model:</h1>
+<pre class="r"><code>### Step 1: Compare full, forward, backward, and stepwise models:
+# 
+# backmod2 = lm(formula(backmod), data=scaled_df, x=TRUE, y=TRUE)
+# formod2 = lm(formula(formod), data=scaled_df, x=TRUE, y=TRUE)
+# stepmod2 = lm(formula(stepmod), data=scaled_df, x=TRUE, y=TRUE)
+# 
+# rmse_Full = 0
+# rmse_Back = 0
+# rmse_For = 0
+# rmse_Step = 0
+# for (i in c(1:20)) {
+#   fu &lt;- cv.lm(fullmod, k=10, seed=i)
+#   ba &lt;- cv.lm(backmod2, k=10, seed=i)
+#   fo &lt;- cv.lm(formod2, k=10, seed=i)
+#   st &lt;- cv.lm(stepmod2, k=10, seed=i)
+#   
+#   rmse_Full=rmse_Full + fu$MSE_sqrt[[1]]
+#   rmse_Back=rmse_Back + ba$MSE_sqrt[[1]]
+#   rmse_For=rmse_For + fo$MSE_sqrt[[1]]
+#   rmse_Step=rmse_Step + st$MSE_sqrt[[1]]
+# }   
+# 
+# rmse_Full/20 # 1081.402
+# rmse_Back/20 # 1055.917
+# rmse_For/20 # 1055.917
+# rmse_Step/20 # 1055.195 ********WINNER********
+# 
+# ### Now use CV to determine whether or not Gender_Female and DistanceFromHome should be included in the final mode:
+# 
+# step_wo_Gender_Female &lt;- lm(Income~JobLevel + `JobRole_Research Director` +
+#                               JobRole_Manager + TotalWorkingYears + 
+#                               `JobRole_Laboratory Technician` +
+#                               BusinessTravel_Travel_Rarely +
+#                               `JobRole_Manufacturing Director` +
+#                               MonthlyRate + PropYearsCompany +
+#                               YearsSinceLastPromotion + DailyRate +
+#                               DistanceFromHome, data=scaled_df,
+#                             x=TRUE, y=TRUE)
+# step_wo_DistanceFromHome &lt;- lm(Income~JobLevel + `JobRole_Research Director` +
+#                               JobRole_Manager + TotalWorkingYears + 
+#                               `JobRole_Laboratory Technician` +
+#                               BusinessTravel_Travel_Rarely +
+#                               `JobRole_Manufacturing Director` +
+#                               MonthlyRate + PropYearsCompany +
+#                               YearsSinceLastPromotion + DailyRate +
+#                               Gender_Female, data=scaled_df,
+#                               x=TRUE, y=TRUE)
+# step_wo_Either &lt;- lm(Income~JobLevel + `JobRole_Research Director` +
+#                               JobRole_Manager + TotalWorkingYears + 
+#                               `JobRole_Laboratory Technician` +
+#                               BusinessTravel_Travel_Rarely +
+#                               `JobRole_Manufacturing Director` +
+#                               MonthlyRate + PropYearsCompany +
+#                               YearsSinceLastPromotion + DailyRate, data=scaled_df,
+#                      x=TRUE, y=TRUE)
+# 
+# rmse_wo_Gender_Female = 0
+# rmse_wo_DistanceFromHome = 0
+# rmse_wo_Either = 0
+# rmse_base = 0
+# for (i in c(1:20)) {
+#   ba &lt;- cv.lm(stepmod2, k=10, seed=i)
+#   woG &lt;- cv.lm(step_wo_Gender_Female, k=10, seed=i)
+#   woD &lt;- cv.lm(step_wo_DistanceFromHome, k=10, seed=i)
+#   woE &lt;- cv.lm(step_wo_Either, k=10, seed=i)
+#   
+#   rmse_base=rmse_base + ba$MSE_sqrt[[1]]
+#   rmse_wo_Gender_Female=rmse_wo_Gender_Female+ woG$MSE_sqrt[[1]]
+#   rmse_wo_DistanceFromHome=rmse_wo_DistanceFromHome + woD$MSE_sqrt[[1]]
+#   rmse_wo_Either=rmse_wo_Either + woE$MSE_sqrt[[1]]
+# } 
+# 
+# rmse_base/20 # 1055.195***********WINNER*********
+# rmse_wo_Gender_Female/20 # 1055.543
+# rmse_wo_DistanceFromHome/20 # 1055.442
+# rmse_wo_Either/20 # 1055.826</code></pre>
+</div>
+<div id="regression-model-diagnostics" class="section level1">
+<h1>Regression Model Diagnostics:</h1>
+<pre class="r"><code># check to make sure that we don&#39;t have problems with multicolinearity
+# step_vif &lt;- vif(stepmod2)
+# step_vif
+# 
+# fullmod_eval &lt;- lm(Income ~ ., data=scaled_df)
+# k &lt;- ols_step_both_p(fullmod_eval, pent=0.15, prem=0.2)
+# 
+# xs &lt;- 1:k$steps
+# par(mfrow=c(2,2))
+# par(mar=c(4,5,1,1))
+# plot(xs,k$adjr,xlab=&quot;step&quot;, ylab=expression(paste(&quot;adjusted R&quot;^&quot;2&quot;)),type=&quot;ol&quot;,pch=16,col=&#39;gray50&#39;)
+# plot(xs,k$mallows_cp,xlab=&quot;step&quot;, ylab=&quot;C(p)&quot;,type=&quot;ol&quot;,pch=16,col=&#39;gray50&#39;)
+# plot(xs,k$sbc,xlab=&quot;step&quot;, ylab=&quot;BIC&quot;,type=&quot;ol&quot;,pch=16,col=&#39;gray50&#39;)
+# plot(xs,k$aic,xlab=&quot;step&quot;, ylab=&quot;AIC&quot;,type=&quot;ol&quot;,pch=16,col=&#39;gray50&#39;)
+# dev.off()
+# 
+# # fit diagnostics
+# par(mfrow=c(2,2))
+# 
+# # plot residuals
+# plot(scaled_df$Income, stepmod2$fitted.values, xlab=&quot;Observed Monthly Income ($)&quot;, ylab=&quot;Predictions ($)&quot;, main=&quot;Fitted Model&quot;)
+# abline(lm(stepmod2$fitted.values~scaled_df$Income), col=&quot;grey10&quot;)
+# 
+# # Studentized Residuals:
+# plot(stepmod2$fitted.values, studres(stepmod2), xlab=&quot;Fitted values ($)&quot;, ylab = &quot;Studentized Residuals&quot;, main = &quot;Studentized Residuals&quot;)
+# lines(c(0,22000), c(2,2), col=&quot;grey10&quot;)
+# lines(c(0,22000), c(-2,-2), col=&quot;grey10&quot;)
+# 
+# # QQ-plot of Residuals:
+# qqnorm(studres(stepmod2), ylab=&quot;Standardized Residuals&quot;, xlab=&quot;Normal Scores&quot;, 
+#        main=&quot;QQ-Plot of Residuals&quot;) 
+# qqline(studres(stepmod2), col=&quot;grey10&quot;)
+# 
+# # Histogram of Residuals:
+# hist(stepmod2$residuals, prob=TRUE, xlab=&quot;residual (observed-predicted)&quot;, main=&quot;Histogram of Residuals&quot;,ylim=c(0,4e-04))
+# lines(density(stepmod2$residuals), col=&quot;dodgerblue&quot;)
+# dev.off()</code></pre>
+</div>
+<div id="load-unlabeled-data-and-predict" class="section level1">
+<h1>Load unlabeled data and predict:</h1>
+<pre class="r"><code># dfu &lt;- readxl::read_xlsx(&#39;CaseStudy2CompSet No Salary.xlsx&#39;)
+# str(dfu)
+# dfu &lt;- dfu %&gt;% select(-c(StandardHours,Over18,EmployeeCount,EmployeeNumber,ID,
+#                        PerformanceRating,Department,Attrition,MaritalStatus))
+# 
+# # Proportion of Total Career Spent at Current Company
+# dfu$TotalWorkingYears[dfu$TotalWorkingYears==0]=0.00001
+# dfu$YearsAtCompany[dfu$YearsAtCompany==0]=0.00001
+# dfu &lt;- dfu %&gt;% mutate(PropYearsCompany = YearsAtCompany/TotalWorkingYears)
+# 
+# reg_dfu &lt;- dummy_cols(dfu, select_columns = c(&quot;EducationField&quot;, &quot;Gender&quot;,&quot;JobRole&quot;,
+#                                             &quot;OverTime&quot;,&quot;BusinessTravel&quot;), 
+#                      remove_selected_columns = TRUE)
+# 
+# scaled_dfu &lt;- reg_dfu %&gt;% mutate_each(funs(scale(.) %&gt;% as.vector))
+# 
+# scaled_dfu &lt;- scaled_dfu %&gt;% select(JobLevel, `JobRole_Research Director`,
+#                               JobRole_Manager, TotalWorkingYears, 
+#                               `JobRole_Laboratory Technician`,
+#                               BusinessTravel_Travel_Rarely,
+#                               `JobRole_Manufacturing Director`,
+#                               MonthlyRate, PropYearsCompany,
+#                               YearsSinceLastPromotion, DailyRate,
+#                               Gender_Female, DistanceFromHome)
+# 
+# predict_df &lt;- data.frame(predict(stepmod2,scaled_dfu))
+# 
+# ##### Write prediction to file:
+# dfu &lt;- readxl::read_xlsx(&#39;CaseStudy2CompSet No Salary.xlsx&#39;)
+# 
+# predict_submit &lt;- data.frame(&quot;ID&quot;=dfu$ID, &quot;MonthlyIncome&quot;=predict_df$predict.stepmod2..scaled_dfu.)
+# 
+# write_csv(predict_submit,&#39;./Salary_Predictions.csv&#39;)</code></pre>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

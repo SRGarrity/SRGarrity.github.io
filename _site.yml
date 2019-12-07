@@ -4,11 +4,11 @@ navbar:
   left:
     - text: "Home"
       href: index.html
-    - text: "CLT Practice"
-      href: CLT_2.html
-    - text: "Craft Beer Rmarkdown"
-      href: Craft_Beer_Rmarkdown.html
     - text: "Craft Beer R Shiny Apps"
       href: craft_beer_case_study.html
     - text: "R Shiny Apps"
       href: r_shiny_apps.html
+    - text: "Predict Attrition"
+      href: PredictAttrition.Rmd
+    - text: "Predict Salary"
+      href: PredictSalary.Rmd

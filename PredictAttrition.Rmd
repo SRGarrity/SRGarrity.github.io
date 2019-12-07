@@ -1,0 +1,312 @@
+---
+title: "Attrition"
+author: "Steven Garrity"
+date: "11/16/2019"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Executive Summary:
+
+# Introduction to the Problem
+The objective of this project is to create a classification model that is capable of predicting attrition (Yes/No). The one requirement is that the model has a sensitivity and specificity > 0.60.
+
+# Load packages
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(GGally)
+library(mlbench)
+library(caret)
+library(corrplot)
+library(randomForest)
+library(knncat)
+library(e1071)
+library(fastDummies)
+library(doSNOW)
+library(parallel)
+```
+
+# Set up system for using parallel processing during model training
+```{r}
+numberofcores = detectCores() # number of cores available on machine
+cl <- makeCluster(numberofcores, type = "SOCK")
+# Register cluster so that caret will know to train in parallel.
+registerDoSNOW(cl)
+```
+
+# Read data and plot
+```{r}
+df <- read.csv('CaseStudy2-data.csv', header=TRUE)
+str(df)
+
+# Remove unnecessary columns:
+drop <- c("StandardHours","Over18","EmployeeCount","EmployeeNumber","ID")
+df <- df[,!(names(df) %in% drop)]
+```
+
+# A bit o' EDA:
+```{r}
+df %>% group_by(JobRole) %>%
+  summarise(count=n()) %>%
+  ggplot(aes(reorder(JobRole, count), y=count)) + 
+  geom_bar(stat="identity", fill="dodgerblue4", col="grey10") +
+  theme(axis.text.x = element_text(angle = 70, hjust = 1)) +
+  labs(x='', title="Job Role")
+
+df %>% group_by(JobLevel) %>%
+  summarise(count=n()) %>%
+  ggplot(aes(reorder(JobLevel, count, desc), y=count)) + 
+  geom_bar(stat="identity", fill="dodgerblue4", col="grey10") +
+  labs(x='', title="Job Level")
+
+df %>% group_by(Gender,Attrition) %>%
+  summarise(count=n()) %>%
+  spread(Attrition,count) %>% 
+  mutate(perc=Yes/No)
+
+```
+
+# Feature Engineering
+```{r}
+# Proportion of Total Career Spent at Current Company
+df$TotalWorkingYears[df$TotalWorkingYears==0]=0.00001
+df$YearsAtCompany[df$YearsAtCompany==0]=0.00001
+df <- df %>% mutate(PropYearsCompany = YearsAtCompany/TotalWorkingYears)
+
+# Average Number of Years Per Company
+df$NumCompaniesWorked[df$NumCompaniesWorked==0]=0.00001
+df <- df %>% mutate(AvgYearsPerCompany = TotalWorkingYears/NumCompaniesWorked)
+
+# Average Years Per Company - Years At Company
+df <- df %>% mutate(YrPerCompMinusYrAtCompany = AvgYearsPerCompany - YearsAtCompany)
+```
+
+# Check pairwise correlations and remove any highly correlated features
+Look at the data and see what you see. Like the bear, who went over the mountain.
+### Helpful guide: https://machinelearningmastery.com/feature-selection-with-the-caret-r-package/
+```{r}
+must_convert <- sapply(df,is.factor)
+converted_features <- sapply(df[,must_convert],unclass)
+numdf <- cbind(df[,!must_convert],converted_features)
+numdf$Attrition <- df$Attrition
+
+
+# Look for redundant features:
+# correlationMatrix <- cor(numdf[,2:dim(numdf)[2]]) # everything but "Attrition"
+correlationMatrix <- cor(numdf[,!names(numdf) %in% "Attrition"]) # everything but "Attrition"
+corrplot(correlationMatrix, method="circle", type="upper", order="hclust")
+highlyCorrelated <- findCorrelation(correlationMatrix, cutoff=0.75) # recommended cutoff = 0.75
+print(highlyCorrelated)
+toremove <- colnames(numdf)[highlyCorrelated] # these variables have correlation > 0.5
+print(toremove)
+
+# remove the highly correlated features:
+# numdf$TotalWorkingYears <- NULL
+# numdf$YearsAtCompany <- NULL
+# # numdf$MonthlyIncome <- NULL
+# numdf$PerformanceRating <- NULL
+# numdf$Department <- NULL
+
+# replot correlation matrix
+correlationMatrix <- cor(numdf[,!names(numdf) %in% "Attrition"]) # everything but "Attrition"
+corrplot(correlationMatrix, method="circle", type="upper", order="hclust")
+```
+
+# Rank All Features by importance
+```{r}
+# prepare training scheme
+control <- trainControl(method="repeatedcv", number=5, repeats=2)
+# train the model
+model <- train(Attrition~., data=numdf, method="lvq", preProcess=c("scale"), trControl=control, metric="Kappa")
+# estimate variable importance
+importance <- varImp(model, scale=TRUE)
+# summarize importance
+print(importance)
+# plot importance
+plot(importance)
+
+# confusionMatrix(predict(model,numdf[,!names(numdf) %in% "Attrition"]),
+#                           numdf$Attrition)
+```
+
+# Automated Feature Selection with Recursive Feature Elimination
+```{r}
+# run the RFE algorithm
+#### REMOVE HIGHLY CORRELATED FEATURES BEFORE DOING THIS STEP! ####
+# x <- numdf 
+# normalization <- preProcess(x)
+# x <- predict(normalization, x)
+# x <- as.data.frame(x)
+# subsets <- c(14,16,18,19,20, 22)
+# ctrl <- rfeControl(functions = rfFuncs,
+#                    method = "repeatedcv",
+#                    repeats = 3,
+#                    verbose = TRUE,
+#                    allowParallel = TRUE)
+# 
+# results <- rfe(x[,!names(numdf) %in% "Attrition"], x$Attrition, sizes=subsets, rfeControl=ctrl, metric = "Kappa")
+# 
+# # summarize the results
+# print(results)
+# # list the chosen features
+# predictors(results)
+# # plot the results
+# plot(results, type=c("g", "o"), xlab="Number of Features", main="Recursive Feature Elimination")
+```
+
+# KNN
+```{r}
+# num_df <- df %>% select("Attrition","OverTime","AvgYearsPerCompany",
+#                         "StockOptionLevel","Age","MaritalStatus",
+#                         "JobInvolvement","JobRole","YearsWithCurrManager",
+#                         "JobLevel","YearsInCurrentRole","WorkLifeBalance",
+#                         "JobSatisfaction","MonthlyIncome","Department",
+#                         "TotalWorkingYears","YearsAtCompany")
+# 
+# knn_df <- dummy_cols(num_df, select_columns = c("OverTime","MaritalStatus",
+#                                                 "JobRole"), 
+#                      remove_selected_columns = TRUE)
+# 
+# numdf2 <- numdf %>% select("Attrition","OverTime","AvgYearsPerCompany",
+#                         "StockOptionLevel","Age","MaritalStatus",
+#                         "JobInvolvement","JobRole","YearsWithCurrManager",
+#                         "JobLevel","YearsInCurrentRole","WorkLifeBalance",
+#                         "JobSatisfaction","MonthlyIncome","Department",
+#                         "TotalWorkingYears", "JobRole","YearsAtCompany")
+
+# ctrl <- trainControl(method = "LOOCV", allowParallel = TRUE)
+# 
+# set.seed(1)
+# mod <- train(Attrition ~ ., data = numdf2,
+#              method = "knn",
+#              tuneGrid = expand.grid(k = c(2,3,4,5,7,9,11,13,15,18,20,25,30)),
+#              preProcess = c("BoxCox","scale","center"),
+#              trControl = ctrl, 
+#              metric="Kappa")
+# 
+# CM_knn = confusionMatrix(table(predict(mod, numdf2[,!names(numdf2) %in% "Attrition"]), knn_df$Attrition))
+# CM_knn
+# 
+# plot(mod, xlab="k nearest neighbors", main="KNN hyperparameter tuning")
+```
+
+# Naive Bayes
+```{r}
+
+# train_control <- trainControl(method="LOOCV",
+#                               # repeats = 2,
+#                               allowParallel = TRUE)
+# 
+# search_grid <- expand.grid(
+#   usekernel = FALSE,
+#   laplace = 0:1,
+#   adjust = seq(1, 4, by = 1))
+# 
+# # train model
+# library(naivebayes)
+# nb_K <- train(Attrition~., data=knn_df,
+#                   method = "naive_bayes",
+#                   trControl = train_control,
+#                   tuneGrid = search_grid,
+#                   # search = "grid",
+#                   metric = "Kappa",
+#                   preProcess = c("BoxCox","scale","center"))
+# 
+# # top 5 models
+# nb_K$results %>% 
+#   top_n(5, wt = Kappa) %>%
+#   arrange(desc(Kappa))
+# 
+# # plot parameter tuning
+# plot(nb_K, main="Naive Bayes Hyperparameter Tuning")
+# 
+# # confusion matrix
+# # confusionMatrix(nb_K)
+# pred_K <- predict(nb_K, knn_df[,!names(knn_df) %in% "Attrition"])
+# confusionMatrix(pred_K,knn_df$Attrition)
+```
+
+# Logistic Regression
+```{r}
+# scaled_df <- numdf %>% select(-Attrition) %>% mutate_each(funs(scale(.) %>% as.vector))
+# scaled_df$Attrition <- numdf$Attrition
+# 
+# 
+# lfit <- glm(relevel(Attrition, ref="No")~., family=binomial(), data=scaled_df)
+# summary(lfit)
+# 
+# ltest <- data.frame("Attrition"=df$Attrition)
+# ltest$probs <- predict(lfit, type="response")
+# ltest$predict <- if_else(ltest$probs > 0.5, "Yes","No")
+# 
+# confusionMatrix(as.factor(ltest$predict),df$Attrition)
+```
+
+# Try a Boosted Classification Tree:
+```{r}
+# ctrl <- trainControl(method = "repeatedcv", 
+#                      number = 5, 
+#                      repeats = 5,
+#                      classProbs = TRUE, 
+#                      allowParallel = TRUE)
+# 
+# searchgrid <- expand.grid(iter=seq(250,750, by=50),
+#                     maxdepth=c(2,3,4),
+#                     nu = c(0.075, 0.1, 0.125))
+# 
+# set.seed(12)
+# m <- train(Attrition~.,data=numdf2,
+#            trControl = ctrl,
+#            method = "ada",
+#            # tuneLength = 12,
+#            tuneGrid=searchgrid,
+#            metric="Kappa",
+#            preProc = c("scale"))
+# 
+# confusionMatrix(predict(m,numdf2[,!names(numdf2) %in% "Attrition"]),df$Attrition)
+# importance <- varImp(m, scale=TRUE)
+# 
+# # plot importance
+# plot(importance)
+# 
+# ggplot(m)
+```
+
+# Predict Attrition and Write to File
+```{r}
+# dfu <- read.csv('CaseStudy2CompSet No Attrition.csv', header=TRUE)
+# # Remove unnecessary columns:
+# drop <- c("StandardHours","Over18","EmployeeCount","EmployeeNumber","ID")
+# dfu <- dfu[,!(names(dfu) %in% drop)]
+# 
+# # Proportion of Total Career Spent at Current Company
+# dfu$TotalWorkingYears[dfu$TotalWorkingYears==0]=0.00001
+# dfu$YearsAtCompany[dfu$YearsAtCompany==0]=0.00001
+# dfu <- dfu %>% mutate(PropYearsCompany = YearsAtCompany/TotalWorkingYears)
+# # Average Number of Years Per Company
+# dfu$NumCompaniesWorked[dfu$NumCompaniesWorked==0]=0.00001
+# dfu <- dfu %>% mutate(AvgYearsPerCompany = TotalWorkingYears/NumCompaniesWorked)
+# # Average Years Per Company - Years At Company
+# dfu <- dfu %>% mutate(YrPerCompMinusYrAtCompany = AvgYearsPerCompany - YearsAtCompany)
+# 
+# must_convert <- sapply(dfu,is.factor)
+# converted_features <- sapply(dfu[,must_convert],unclass)
+# numdfu <- cbind(dfu[,!must_convert],converted_features)
+# 
+# predicted_df <- predict(m,numdfu)
+# 
+# dfu2 <- read.csv('CaseStudy2CompSet No Attrition.csv', header=TRUE)
+# predict_submit <- data.frame("ID"=dfu2$ID,"Attrition"=predicted_df)
+# 
+# write_csv(predict_submit,'./Attrition_Predictions.csv')
+```
+
+# Helpful resources:
+http://topepo.github.io/caret/model-training-and-tuning.html#model-training-and-parameter-tuning
+http://topepo.github.io/caret/recursive-feature-elimination.html#rfe
+https://machinelearningmastery.com/an-introduction-to-feature-selection/
+https://machinelearningmastery.com/feature-selection-with-the-caret-r-package/
+
+

@@ -1,0 +1,21 @@
+---
+title: "question2"
+output: html_document
+---
+
+```{r question2, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Question 2
+As a check on importing and merging data, print the first six and last six observations.
+```{r}
+cat ("The first six observations, after sorting by beer ID.")
+head(merged,6)
+```
+```{r}
+cat ("The last six observations, after sorting by beer ID.")
+tail(merged,6)
+```
+

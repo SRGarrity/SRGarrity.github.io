@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Steven Garrity" />
+
+<meta name="date" content="2019-11-16" />
+
+<title>Attrition</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="craft_beer_case_study.html">Craft Beer R Shiny Apps</a>
+</li>
+<li>
+  <a href="r_shiny_apps.html">R Shiny Apps</a>
+</li>
+<li>
+  <a href="PredictAttrition.Rmd">Predict Attrition</a>
+</li>
+<li>
+  <a href="PredictSalary.Rmd">Predict Salary</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Attrition</h1>
+<h4 class="author">Steven Garrity</h4>
+<h4 class="date">11/16/2019</h4>
+
+</div>
+
+
+<div id="executive-summary" class="section level1">
+<h1>Executive Summary:</h1>
+</div>
+<div id="introduction-to-the-problem" class="section level1">
+<h1>Introduction to the Problem</h1>
+<p>The objective of this project is to create a classification model that is capable of predicting attrition (Yes/No). The one requirement is that the model has a sensitivity and specificity &gt; 0.60.</p>
+</div>
+<div id="load-packages" class="section level1">
+<h1>Load packages</h1>
+<pre class="r"><code>library(tidyverse)
+library(ggplot2)
+library(GGally)
+library(mlbench)
+library(caret)
+library(corrplot)
+library(randomForest)
+library(knncat)
+library(e1071)
+library(fastDummies)
+library(doSNOW)
+library(parallel)</code></pre>
+</div>
+<div id="set-up-system-for-using-parallel-processing-during-model-training" class="section level1">
+<h1>Set up system for using parallel processing during model training</h1>
+<pre class="r"><code>numberofcores = detectCores() # number of cores available on machine
+cl &lt;- makeCluster(numberofcores, type = &quot;SOCK&quot;)
+# Register cluster so that caret will know to train in parallel.
+registerDoSNOW(cl)</code></pre>
+</div>
+<div id="read-data-and-plot" class="section level1">
+<h1>Read data and plot</h1>
+<pre class="r"><code>df &lt;- read.csv(&#39;CaseStudy2-data.csv&#39;, header=TRUE)
+str(df)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    870 obs. of  36 variables:
+##  $ ID                      : int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ Age                     : int  32 40 35 32 24 27 41 37 34 34 ...
+##  $ Attrition               : Factor w/ 2 levels &quot;No&quot;,&quot;Yes&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ BusinessTravel          : Factor w/ 3 levels &quot;Non-Travel&quot;,&quot;Travel_Frequently&quot;,..: 3 3 2 3 2 2 3 3 3 2 ...
+##  $ DailyRate               : int  117 1308 200 801 567 294 1283 309 1333 653 ...
+##  $ Department              : Factor w/ 3 levels &quot;Human Resources&quot;,..: 3 2 2 3 2 2 2 3 3 2 ...
+##  $ DistanceFromHome        : int  13 14 18 1 2 10 5 10 10 10 ...
+##  $ Education               : int  4 3 2 4 1 2 5 4 4 4 ...
+##  $ EducationField          : Factor w/ 6 levels &quot;Human Resources&quot;,..: 2 4 2 3 6 2 4 2 2 6 ...
+##  $ EmployeeCount           : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ EmployeeNumber          : int  859 1128 1412 2016 1646 733 1448 1105 1055 1597 ...
+##  $ EnvironmentSatisfaction : int  2 3 3 3 1 4 2 4 3 4 ...
+##  $ Gender                  : Factor w/ 2 levels &quot;Female&quot;,&quot;Male&quot;: 2 2 2 1 1 2 2 1 1 2 ...
+##  $ HourlyRate              : int  73 44 60 48 32 32 90 88 87 92 ...
+##  $ JobInvolvement          : int  3 2 3 3 3 3 4 2 3 2 ...
+##  $ JobLevel                : int  2 5 3 3 1 3 1 2 1 2 ...
+##  $ JobRole                 : Factor w/ 9 levels &quot;Healthcare Representative&quot;,..: 8 6 5 8 7 5 7 8 9 1 ...
+##  $ JobSatisfaction         : int  4 3 4 4 4 1 3 4 3 3 ...
+##  $ MaritalStatus           : Factor w/ 3 levels &quot;Divorced&quot;,&quot;Married&quot;,..: 1 3 3 2 3 1 2 1 2 2 ...
+##  $ MonthlyIncome           : int  4403 19626 9362 10422 3760 8793 2127 6694 2220 5063 ...
+##  $ MonthlyRate             : int  9250 17544 19944 24032 17218 4809 5561 24223 18410 15332 ...
+##  $ NumCompaniesWorked      : int  2 1 2 1 1 1 2 2 1 1 ...
+##  $ Over18                  : Factor w/ 1 level &quot;Y&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ OverTime                : Factor w/ 2 levels &quot;No&quot;,&quot;Yes&quot;: 1 1 1 1 2 1 2 2 2 1 ...
+##  $ PercentSalaryHike       : int  11 14 11 19 13 21 12 14 19 14 ...
+##  $ PerformanceRating       : int  3 3 3 3 3 4 3 3 3 3 ...
+##  $ RelationshipSatisfaction: int  3 1 3 3 3 3 1 3 4 2 ...
+##  $ StandardHours           : int  80 80 80 80 80 80 80 80 80 80 ...
+##  $ StockOptionLevel        : int  1 0 0 2 0 2 0 3 1 1 ...
+##  $ TotalWorkingYears       : int  8 21 10 14 6 9 7 8 1 8 ...
+##  $ TrainingTimesLastYear   : int  3 2 2 3 2 4 5 5 2 3 ...
+##  $ WorkLifeBalance         : int  2 4 3 3 3 2 2 3 3 2 ...
+##  $ YearsAtCompany          : int  5 20 2 14 6 9 4 1 1 8 ...
+##  $ YearsInCurrentRole      : int  2 7 2 10 3 7 2 0 1 2 ...
+##  $ YearsSinceLastPromotion : int  0 4 2 5 1 1 0 0 0 7 ...
+##  $ YearsWithCurrManager    : int  3 9 2 7 3 7 3 0 0 7 ...</code></pre>
+<pre class="r"><code># Remove unnecessary columns:
+drop &lt;- c(&quot;StandardHours&quot;,&quot;Over18&quot;,&quot;EmployeeCount&quot;,&quot;EmployeeNumber&quot;,&quot;ID&quot;)
+df &lt;- df[,!(names(df) %in% drop)]</code></pre>
+</div>
+<div id="a-bit-o-eda" class="section level1">
+<h1>A bit o’ EDA:</h1>
+<pre class="r"><code>df %&gt;% group_by(JobRole) %&gt;%
+  summarise(count=n()) %&gt;%
+  ggplot(aes(reorder(JobRole, count), y=count)) + 
+  geom_bar(stat=&quot;identity&quot;, fill=&quot;dodgerblue4&quot;, col=&quot;grey10&quot;) +
+  theme(axis.text.x = element_text(angle = 70, hjust = 1)) +
+  labs(x=&#39;&#39;, title=&quot;Job Role&quot;)</code></pre>
+<p><img src="PredictAttrition_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>df %&gt;% group_by(JobLevel) %&gt;%
+  summarise(count=n()) %&gt;%
+  ggplot(aes(reorder(JobLevel, count, desc), y=count)) + 
+  geom_bar(stat=&quot;identity&quot;, fill=&quot;dodgerblue4&quot;, col=&quot;grey10&quot;) +
+  labs(x=&#39;&#39;, title=&quot;Job Level&quot;)</code></pre>
+<p><img src="PredictAttrition_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<pre class="r"><code>df %&gt;% group_by(Gender,Attrition) %&gt;%
+  summarise(count=n()) %&gt;%
+  spread(Attrition,count) %&gt;% 
+  mutate(perc=Yes/No)</code></pre>
+<pre><code>## # A tibble: 2 x 4
+## # Groups:   Gender [2]
+##   Gender    No   Yes  perc
+##   &lt;fct&gt;  &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+## 1 Female   301    53 0.176
+## 2 Male     429    87 0.203</code></pre>
+</div>
+<div id="feature-engineering" class="section level1">
+<h1>Feature Engineering</h1>
+<pre class="r"><code># Proportion of Total Career Spent at Current Company
+df$TotalWorkingYears[df$TotalWorkingYears==0]=0.00001
+df$YearsAtCompany[df$YearsAtCompany==0]=0.00001
+df &lt;- df %&gt;% mutate(PropYearsCompany = YearsAtCompany/TotalWorkingYears)
+
+# Average Number of Years Per Company
+df$NumCompaniesWorked[df$NumCompaniesWorked==0]=0.00001
+df &lt;- df %&gt;% mutate(AvgYearsPerCompany = TotalWorkingYears/NumCompaniesWorked)
+
+# Average Years Per Company - Years At Company
+df &lt;- df %&gt;% mutate(YrPerCompMinusYrAtCompany = AvgYearsPerCompany - YearsAtCompany)</code></pre>
+</div>
+<div id="check-pairwise-correlations-and-remove-any-highly-correlated-features" class="section level1">
+<h1>Check pairwise correlations and remove any highly correlated features</h1>
+<p>Look at the data and see what you see. Like the bear, who went over the mountain. ### Helpful guide: <a href="https://machinelearningmastery.com/feature-selection-with-the-caret-r-package/" class="uri">https://machinelearningmastery.com/feature-selection-with-the-caret-r-package/</a></p>
+<pre class="r"><code>must_convert &lt;- sapply(df,is.factor)
+converted_features &lt;- sapply(df[,must_convert],unclass)
+numdf &lt;- cbind(df[,!must_convert],converted_features)
+numdf$Attrition &lt;- df$Attrition
+
+
+# Look for redundant features:
+# correlationMatrix &lt;- cor(numdf[,2:dim(numdf)[2]]) # everything but &quot;Attrition&quot;
+correlationMatrix &lt;- cor(numdf[,!names(numdf) %in% &quot;Attrition&quot;]) # everything but &quot;Attrition&quot;
+corrplot(correlationMatrix, method=&quot;circle&quot;, type=&quot;upper&quot;, order=&quot;hclust&quot;)
+highlyCorrelated &lt;- findCorrelation(correlationMatrix, cutoff=0.75) # recommended cutoff = 0.75
+print(highlyCorrelated)</code></pre>
+<pre><code>## [1] 20 17  8 25 14</code></pre>
+<pre class="r"><code>toremove &lt;- colnames(numdf)[highlyCorrelated] # these variables have correlation &gt; 0.5
+print(toremove)</code></pre>
+<pre><code>## [1] &quot;YearsAtCompany&quot;     &quot;TotalWorkingYears&quot;  &quot;JobLevel&quot;          
+## [4] &quot;AvgYearsPerCompany&quot; &quot;PerformanceRating&quot;</code></pre>
+<pre class="r"><code># remove the highly correlated features:
+# numdf$TotalWorkingYears &lt;- NULL
+# numdf$YearsAtCompany &lt;- NULL
+# # numdf$MonthlyIncome &lt;- NULL
+# numdf$PerformanceRating &lt;- NULL
+# numdf$Department &lt;- NULL
+
+# replot correlation matrix
+correlationMatrix &lt;- cor(numdf[,!names(numdf) %in% &quot;Attrition&quot;]) # everything but &quot;Attrition&quot;
+corrplot(correlationMatrix, method=&quot;circle&quot;, type=&quot;upper&quot;, order=&quot;hclust&quot;)</code></pre>
+<p><img src="PredictAttrition_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="rank-all-features-by-importance" class="section level1">
+<h1>Rank All Features by importance</h1>
+<pre class="r"><code># prepare training scheme
+control &lt;- trainControl(method=&quot;repeatedcv&quot;, number=5, repeats=2)
+# train the model
+model &lt;- train(Attrition~., data=numdf, method=&quot;lvq&quot;, preProcess=c(&quot;scale&quot;), trControl=control, metric=&quot;Kappa&quot;)
+# estimate variable importance
+importance &lt;- varImp(model, scale=TRUE)
+# summarize importance
+print(importance)</code></pre>
+<pre><code>## ROC curve variable importance
+## 
+##   only 20 most important variables shown (out of 33)
+## 
+##                         Importance
+## AvgYearsPerCompany          100.00
+## OverTime                     97.61
+## MonthlyIncome                91.08
+## TotalWorkingYears            90.85
+## YearsAtCompany               85.40
+## StockOptionLevel             84.52
+## MaritalStatus                83.54
+## JobLevel                     81.65
+## YearsInCurrentRole           81.47
+## YearsWithCurrManager         74.94
+## Age                          73.40
+## JobInvolvement               67.25
+## JobSatisfaction              48.20
+## JobRole                      47.94
+## Department                   34.86
+## DistanceFromHome             33.78
+## EnvironmentSatisfaction      30.61
+## WorkLifeBalance              28.22
+## TrainingTimesLastYear        24.53
+## Education                    21.94</code></pre>
+<pre class="r"><code># plot importance
+plot(importance)</code></pre>
+<p><img src="PredictAttrition_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code># confusionMatrix(predict(model,numdf[,!names(numdf) %in% &quot;Attrition&quot;]),
+#                           numdf$Attrition)</code></pre>
+</div>
+<div id="automated-feature-selection-with-recursive-feature-elimination" class="section level1">
+<h1>Automated Feature Selection with Recursive Feature Elimination</h1>
+<pre class="r"><code># run the RFE algorithm
+#### REMOVE HIGHLY CORRELATED FEATURES BEFORE DOING THIS STEP! ####
+# x &lt;- numdf 
+# normalization &lt;- preProcess(x)
+# x &lt;- predict(normalization, x)
+# x &lt;- as.data.frame(x)
+# subsets &lt;- c(14,16,18,19,20, 22)
+# ctrl &lt;- rfeControl(functions = rfFuncs,
+#                    method = &quot;repeatedcv&quot;,
+#                    repeats = 3,
+#                    verbose = TRUE,
+#                    allowParallel = TRUE)
+# 
+# results &lt;- rfe(x[,!names(numdf) %in% &quot;Attrition&quot;], x$Attrition, sizes=subsets, rfeControl=ctrl, metric = &quot;Kappa&quot;)
+# 
+# # summarize the results
+# print(results)
+# # list the chosen features
+# predictors(results)
+# # plot the results
+# plot(results, type=c(&quot;g&quot;, &quot;o&quot;), xlab=&quot;Number of Features&quot;, main=&quot;Recursive Feature Elimination&quot;)</code></pre>
+</div>
+<div id="knn" class="section level1">
+<h1>KNN</h1>
+<pre class="r"><code># num_df &lt;- df %&gt;% select(&quot;Attrition&quot;,&quot;OverTime&quot;,&quot;AvgYearsPerCompany&quot;,
+#                         &quot;StockOptionLevel&quot;,&quot;Age&quot;,&quot;MaritalStatus&quot;,
+#                         &quot;JobInvolvement&quot;,&quot;JobRole&quot;,&quot;YearsWithCurrManager&quot;,
+#                         &quot;JobLevel&quot;,&quot;YearsInCurrentRole&quot;,&quot;WorkLifeBalance&quot;,
+#                         &quot;JobSatisfaction&quot;,&quot;MonthlyIncome&quot;,&quot;Department&quot;,
+#                         &quot;TotalWorkingYears&quot;,&quot;YearsAtCompany&quot;)
+# 
+# knn_df &lt;- dummy_cols(num_df, select_columns = c(&quot;OverTime&quot;,&quot;MaritalStatus&quot;,
+#                                                 &quot;JobRole&quot;), 
+#                      remove_selected_columns = TRUE)
+# 
+# numdf2 &lt;- numdf %&gt;% select(&quot;Attrition&quot;,&quot;OverTime&quot;,&quot;AvgYearsPerCompany&quot;,
+#                         &quot;StockOptionLevel&quot;,&quot;Age&quot;,&quot;MaritalStatus&quot;,
+#                         &quot;JobInvolvement&quot;,&quot;JobRole&quot;,&quot;YearsWithCurrManager&quot;,
+#                         &quot;JobLevel&quot;,&quot;YearsInCurrentRole&quot;,&quot;WorkLifeBalance&quot;,
+#                         &quot;JobSatisfaction&quot;,&quot;MonthlyIncome&quot;,&quot;Department&quot;,
+#                         &quot;TotalWorkingYears&quot;, &quot;JobRole&quot;,&quot;YearsAtCompany&quot;)
+
+# ctrl &lt;- trainControl(method = &quot;LOOCV&quot;, allowParallel = TRUE)
+# 
+# set.seed(1)
+# mod &lt;- train(Attrition ~ ., data = numdf2,
+#              method = &quot;knn&quot;,
+#              tuneGrid = expand.grid(k = c(2,3,4,5,7,9,11,13,15,18,20,25,30)),
+#              preProcess = c(&quot;BoxCox&quot;,&quot;scale&quot;,&quot;center&quot;),
+#              trControl = ctrl, 
+#              metric=&quot;Kappa&quot;)
+# 
+# CM_knn = confusionMatrix(table(predict(mod, numdf2[,!names(numdf2) %in% &quot;Attrition&quot;]), knn_df$Attrition))
+# CM_knn
+# 
+# plot(mod, xlab=&quot;k nearest neighbors&quot;, main=&quot;KNN hyperparameter tuning&quot;)</code></pre>
+</div>
+<div id="naive-bayes" class="section level1">
+<h1>Naive Bayes</h1>
+<pre class="r"><code># train_control &lt;- trainControl(method=&quot;LOOCV&quot;,
+#                               # repeats = 2,
+#                               allowParallel = TRUE)
+# 
+# search_grid &lt;- expand.grid(
+#   usekernel = FALSE,
+#   laplace = 0:1,
+#   adjust = seq(1, 4, by = 1))
+# 
+# # train model
+# library(naivebayes)
+# nb_K &lt;- train(Attrition~., data=knn_df,
+#                   method = &quot;naive_bayes&quot;,
+#                   trControl = train_control,
+#                   tuneGrid = search_grid,
+#                   # search = &quot;grid&quot;,
+#                   metric = &quot;Kappa&quot;,
+#                   preProcess = c(&quot;BoxCox&quot;,&quot;scale&quot;,&quot;center&quot;))
+# 
+# # top 5 models
+# nb_K$results %&gt;% 
+#   top_n(5, wt = Kappa) %&gt;%
+#   arrange(desc(Kappa))
+# 
+# # plot parameter tuning
+# plot(nb_K, main=&quot;Naive Bayes Hyperparameter Tuning&quot;)
+# 
+# # confusion matrix
+# # confusionMatrix(nb_K)
+# pred_K &lt;- predict(nb_K, knn_df[,!names(knn_df) %in% &quot;Attrition&quot;])
+# confusionMatrix(pred_K,knn_df$Attrition)</code></pre>
+</div>
+<div id="logistic-regression" class="section level1">
+<h1>Logistic Regression</h1>
+<pre class="r"><code># scaled_df &lt;- numdf %&gt;% select(-Attrition) %&gt;% mutate_each(funs(scale(.) %&gt;% as.vector))
+# scaled_df$Attrition &lt;- numdf$Attrition
+# 
+# 
+# lfit &lt;- glm(relevel(Attrition, ref=&quot;No&quot;)~., family=binomial(), data=scaled_df)
+# summary(lfit)
+# 
+# ltest &lt;- data.frame(&quot;Attrition&quot;=df$Attrition)
+# ltest$probs &lt;- predict(lfit, type=&quot;response&quot;)
+# ltest$predict &lt;- if_else(ltest$probs &gt; 0.5, &quot;Yes&quot;,&quot;No&quot;)
+# 
+# confusionMatrix(as.factor(ltest$predict),df$Attrition)</code></pre>
+</div>
+<div id="try-a-boosted-classification-tree" class="section level1">
+<h1>Try a Boosted Classification Tree:</h1>
+<pre class="r"><code># ctrl &lt;- trainControl(method = &quot;repeatedcv&quot;, 
+#                      number = 5, 
+#                      repeats = 5,
+#                      classProbs = TRUE, 
+#                      allowParallel = TRUE)
+# 
+# searchgrid &lt;- expand.grid(iter=seq(250,750, by=50),
+#                     maxdepth=c(2,3,4),
+#                     nu = c(0.075, 0.1, 0.125))
+# 
+# set.seed(12)
+# m &lt;- train(Attrition~.,data=numdf2,
+#            trControl = ctrl,
+#            method = &quot;ada&quot;,
+#            # tuneLength = 12,
+#            tuneGrid=searchgrid,
+#            metric=&quot;Kappa&quot;,
+#            preProc = c(&quot;scale&quot;))
+# 
+# confusionMatrix(predict(m,numdf2[,!names(numdf2) %in% &quot;Attrition&quot;]),df$Attrition)
+# importance &lt;- varImp(m, scale=TRUE)
+# 
+# # plot importance
+# plot(importance)
+# 
+# ggplot(m)</code></pre>
+</div>
+<div id="predict-attrition-and-write-to-file" class="section level1">
+<h1>Predict Attrition and Write to File</h1>
+<pre class="r"><code># dfu &lt;- read.csv(&#39;CaseStudy2CompSet No Attrition.csv&#39;, header=TRUE)
+# # Remove unnecessary columns:
+# drop &lt;- c(&quot;StandardHours&quot;,&quot;Over18&quot;,&quot;EmployeeCount&quot;,&quot;EmployeeNumber&quot;,&quot;ID&quot;)
+# dfu &lt;- dfu[,!(names(dfu) %in% drop)]
+# 
+# # Proportion of Total Career Spent at Current Company
+# dfu$TotalWorkingYears[dfu$TotalWorkingYears==0]=0.00001
+# dfu$YearsAtCompany[dfu$YearsAtCompany==0]=0.00001
+# dfu &lt;- dfu %&gt;% mutate(PropYearsCompany = YearsAtCompany/TotalWorkingYears)
+# # Average Number of Years Per Company
+# dfu$NumCompaniesWorked[dfu$NumCompaniesWorked==0]=0.00001
+# dfu &lt;- dfu %&gt;% mutate(AvgYearsPerCompany = TotalWorkingYears/NumCompaniesWorked)
+# # Average Years Per Company - Years At Company
+# dfu &lt;- dfu %&gt;% mutate(YrPerCompMinusYrAtCompany = AvgYearsPerCompany - YearsAtCompany)
+# 
+# must_convert &lt;- sapply(dfu,is.factor)
+# converted_features &lt;- sapply(dfu[,must_convert],unclass)
+# numdfu &lt;- cbind(dfu[,!must_convert],converted_features)
+# 
+# predicted_df &lt;- predict(m,numdfu)
+# 
+# dfu2 &lt;- read.csv(&#39;CaseStudy2CompSet No Attrition.csv&#39;, header=TRUE)
+# predict_submit &lt;- data.frame(&quot;ID&quot;=dfu2$ID,&quot;Attrition&quot;=predicted_df)
+# 
+# write_csv(predict_submit,&#39;./Attrition_Predictions.csv&#39;)</code></pre>
+</div>
+<div id="helpful-resources" class="section level1">
+<h1>Helpful resources:</h1>
+<p><a href="http://topepo.github.io/caret/model-training-and-tuning.html#model-training-and-parameter-tuning" class="uri">http://topepo.github.io/caret/model-training-and-tuning.html#model-training-and-parameter-tuning</a> <a href="http://topepo.github.io/caret/recursive-feature-elimination.html#rfe" class="uri">http://topepo.github.io/caret/recursive-feature-elimination.html#rfe</a> <a href="https://machinelearningmastery.com/an-introduction-to-feature-selection/" class="uri">https://machinelearningmastery.com/an-introduction-to-feature-selection/</a> <a href="https://machinelearningmastery.com/feature-selection-with-the-caret-r-package/" class="uri">https://machinelearningmastery.com/feature-selection-with-the-caret-r-package/</a></p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
